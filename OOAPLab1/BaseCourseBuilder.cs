@@ -1,4 +1,6 @@
-﻿namespace OOAPLabs;
+﻿using OOAPLab1;
+
+namespace OOAPLabs;
 
 public abstract class BaseCourseBuilder
 {
@@ -20,7 +22,6 @@ public abstract class BaseCourseBuilder
 
     public virtual BaseCourseBuilder SetStudents(ListBox.SelectedObjectCollection students)
     {
-        var studentsList = new List<Student>();
         foreach (var student in students)
         {
             var elements = student.ToString().Split(' ');
@@ -33,8 +34,6 @@ public abstract class BaseCourseBuilder
             }
             _course.Students.Add(studentDto);
         }
-
-        _course.Students = studentsList;
         return this;
     }
 
