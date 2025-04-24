@@ -1,16 +1,15 @@
-﻿using Lab3.Pattern.Client;
-using Lab3.Server.Models;
+﻿using Lab3.Server.Models;
 
-namespace Lab3.Pattern;
+namespace Lab3.Pattern.Client;
 
-public class Participant
+public class UserService
 {
     public event Action<string>? OnMessageReceived;
     
     private readonly User _user;
     private readonly IChatMediator _chat;
 
-    public Participant(User user, IChatMediator chat)
+    public UserService(User user, IChatMediator chat)
     {
         _user = user;
         _chat = chat;
@@ -20,9 +19,6 @@ public class Participant
     
     private void ReceiveMessage(ChatContent content)
     {
-        if (content.SenderName == _user.Username)
-            return;
-        
         var message = content.Content;
         var senderName = content.SenderName;
         

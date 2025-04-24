@@ -1,7 +1,7 @@
-﻿using Lab3.Pattern.Client;
+﻿using Lab3.NoPattern.Client;
 using Lab3.Server.Models;
 
-namespace Lab3.Pattern;
+namespace Lab3.NoPattern;
 
 public partial class Chat : Form
 {
@@ -15,9 +15,14 @@ public partial class Chat : Form
         userService.OnMessageReceived += ReceiveMessage;
     }
 
-    private void ReceiveMessage(string message)
+    private void ReceiveMessage(ChatContent chatContent)
     {
-        ChatBox.Items.Add(message);
+        var senderName = chatContent.SenderName;
+        var message = chatContent.Content;
+        
+        var text = chatContent.IsPremium ? chatContent.SenderName + $"[VIP]:  {message}" : senderName + ": " + message;
+        
+        ChatBox.Items.Add(text);
     }
 
 
@@ -27,14 +32,14 @@ public partial class Chat : Form
         if (string.IsNullOrWhiteSpace(message))
             return;
         
-        var text = _userService.SendMessage(message);
-        if (string.IsNullOrWhiteSpace(text))
-            return;
+        _userService.SendMessage(message);
         
-        ChatBox.Items.Add(text);
+        ChatBox.Items.Add(message);
         
         MessageTextBox.Clear();
     }
+    
+    
 
     private void DisconnectButton_Click(object sender, EventArgs e)
     {

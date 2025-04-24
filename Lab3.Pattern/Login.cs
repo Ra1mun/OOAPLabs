@@ -21,10 +21,10 @@ public partial class Login : Form
             Premium = premium
         };
 
-        var chatRoom = new ChatClient(user);
+        IChatMediator chatRoom = new ChatMediator(user);
         chatRoom.Connect();
 
-        var participant = new Participant(user, chatRoom);
+        var participant = new UserService(user, chatRoom);
 
         var chat = new Chat(participant);
         chat.Show();

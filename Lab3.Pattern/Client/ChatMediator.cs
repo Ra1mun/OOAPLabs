@@ -10,29 +10,31 @@ namespace Lab3.Pattern.Client;
 public interface IChatMediator
 { 
     Action<ChatContent>? MessageReceived { get; set; }
-    
+
+
+    void Connect();
     void SendMessage(string content);
     void Disconnect();
 }
 
-public class ChatClient : IDisposable, IChatMediator
+public class ChatMediator : IDisposable, IChatMediator
 {
     public Action<ChatContent>? MessageReceived { get; set; }
 
     private readonly UdpClient _client = new();
     private readonly User _user;
     
-    private readonly Thread _heartbeatThread;
+    private readonly Thread _isAliveThread;
     private readonly Thread _receiveThread;
     
     private bool _isRunning;
 
-    public ChatClient(User user)
+    public ChatMediator(User user)
     {
         _user = user;
 
         _receiveThread = new Thread(ReceiveMessages);
-        _heartbeatThread = new Thread(SendHeartbeat);
+        _isAliveThread = new Thread(SendIsAlive);
     }
 
     public void Connect()
@@ -52,7 +54,7 @@ public class ChatClient : IDisposable, IChatMediator
 
         _isRunning = true;
         _receiveThread.Start();
-        _heartbeatThread.Start();
+        _isAliveThread.Start();
     }
 
     private void ReceiveMessages()
@@ -64,6 +66,9 @@ public class ChatClient : IDisposable, IChatMediator
                 var data = _client.Receive(ref remoteEndPoint);
                 var json = Encoding.UTF8.GetString(data);
                 var message = JsonSerializer.Deserialize<ChatContent>(json);
+                
+                if (message.SenderName == _user.Username)
+                    continue;
 
                 if (message.MessageType == MessageTypes.Ack)
                     continue;
@@ -90,7 +95,7 @@ public class ChatClient : IDisposable, IChatMediator
             }
     }
 
-    private void SendHeartbeat()
+    private void SendIsAlive()
     {
         while (_isRunning)
             try
@@ -159,6 +164,6 @@ public class ChatClient : IDisposable, IChatMediator
 
         // Ждем завершения потоков
         if (_receiveThread.IsAlive) _receiveThread.Join();
-        if (_heartbeatThread.IsAlive) _heartbeatThread.Join();
+        if (_isAliveThread.IsAlive) _isAliveThread.Join();
     }
 }

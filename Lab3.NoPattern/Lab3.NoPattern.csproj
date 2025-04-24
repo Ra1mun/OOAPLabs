@@ -8,4 +8,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Update="Chat.cs">
+        <SubType>Form</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Lab3.Server\Lab3.Server.csproj" />
+    </ItemGroup>
+
 </Project>
