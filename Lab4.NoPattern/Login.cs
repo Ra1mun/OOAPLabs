@@ -1,7 +1,6 @@
-using Lab3.Pattern.Client;
-using Lab3.Pattern.Plugins;
+using Lab4.NoPattern.Client;
 
-namespace Lab3.Pattern;
+namespace Lab4.NoPattern;
 
 public partial class Login : Form
 {
@@ -36,16 +35,8 @@ public partial class Login : Form
 
         var service = SetupServices(user, chatRoom);
         
-        RegisterPlugins(service);
-        
         return service;
     }
-
-    private static void RegisterPlugins(UserService service)
-    {
-        service.RegisterPlugin(new EmojiPlugin());
-    }
-
     private static UserService SetupServices(User user, IChatMediator chatRoom)
     {
         return new UserService(user, chatRoom);

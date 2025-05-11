@@ -1,7 +1,6 @@
-﻿using Lab3.Pattern.Plugins;
-using Lab3.Server.Models;
+﻿using Lab3.Server.Models;
 
-namespace Lab3.Pattern.Client;
+namespace Lab4.NoPattern.Client;
 
 public class UserService
 {
@@ -9,7 +8,15 @@ public class UserService
     
     private readonly User _user;
     private readonly IChatMediator _chat;
-    private readonly List<IChatPlugin> _plugins = new();
+    
+    private readonly Dictionary<string, string> _emojiMap = new()
+    {
+        { ":)", "😊" },
+        { ":(", "😢" },
+        { ":D", "😃" },
+        { ":P", "😛" },
+        { "<3", "❤️" }
+    };
 
     public UserService(User user, IChatMediator chat)
     {
@@ -52,31 +59,10 @@ public class UserService
         return _user.Premium ? _user.Username + $"[VIP]:  {processedMessage}" : _user.Username + ": " + processedMessage;
     }
     
-    public void RegisterPlugin(IChatPlugin plugin)
-    {
-        if (!_plugins.Contains(plugin))
-        {
-            _plugins.Add(plugin);
-        }
-    }
-
-    public void UnregisterPlugin(IChatPlugin plugin)
-    {
-        _plugins.Remove(plugin);
-    }
-    
     private string ProcessMessage(string message)
     {
-        string processedMessage = null;
-        foreach (var plugin in _plugins)
-        {
-                    
-            if (string.IsNullOrEmpty(processedMessage))
-                processedMessage = plugin.ProcessMessage(message, _user);
+        var processedMessage = _emojiMap.Aggregate(message, (current, emoji) => current.Replace(emoji.Key, emoji.Value));
 
-            processedMessage = plugin.ProcessMessage(processedMessage, _user);
-        }
-        
         return processedMessage;
     }
 

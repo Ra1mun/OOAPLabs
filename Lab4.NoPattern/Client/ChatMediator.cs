@@ -2,11 +2,10 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using Lab3.Pattern.Plugins;
 using Lab3.Server.Models;
 using Lab3.Server.Server;
 
-namespace Lab3.Pattern.Client;
+namespace Lab4.NoPattern.Client;
 
 public interface IChatMediator
 { 

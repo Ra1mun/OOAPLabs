@@ -3,26 +3,29 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using Lab3.Server.Database.Service;
 using Lab3.Server.Models;
 
 namespace Lab3.Server.Server;
 
 public class ChatServer
 {
+    private readonly ChatHistoryService _service;
     private readonly UdpClient _server = new(ServerSettings.PORT);
     
     private readonly ConcurrentDictionary<string, (IPEndPoint Endpoint, ClientInfo Info)> _clients = new();
     private readonly ConcurrentDictionary<string, (ChatContent Message, DateTime SentTime)> _pendingAcks = new();
 
-    //Threads
     private readonly Thread _heartbeatThread;
     private readonly Thread _receiveThread;
     private readonly Thread _retryThread;
 
     private bool _isRunning;
 
-    public ChatServer()
+    public ChatServer(ChatHistoryService service)
     {
+        _service = service;
+        
         _receiveThread = new Thread(ReceiveMessages);
         _heartbeatThread = new Thread(CheckClientsAlive);
         _retryThread = new Thread(RetryPendingMessages);
@@ -82,6 +85,7 @@ public class ChatServer
 
                 case MessageTypes.ChatMessage:
                     BroadcastMessage(message, endpoint);
+                    SaveMessage(message);
                     break;
 
                 case MessageTypes.UserLeft:
@@ -162,6 +166,11 @@ public class ChatServer
                 Console.WriteLine($"Ошибка отправки сообщения клиенту {client.Key}: {ex.Message}");
             }
         }
+    }
+
+    private void SaveMessage(ChatContent content)
+    {
+        _service.AddMessage(content);
     }
 
     private void CheckClientsAlive()
